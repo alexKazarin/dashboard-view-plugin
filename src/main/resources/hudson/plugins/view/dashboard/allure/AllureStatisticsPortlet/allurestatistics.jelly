@@ -23,97 +23,104 @@
     </tr>
     <j:if test="${it.useBackgroundColors}">
       <j:forEach var="ar" items="${summary.allureResults}">
-        <tr style="border: 1px #bbb solid;">
-          <td align="left" style="vertical-align:middle" height="50"
-            bgcolor="#${it.getRowColor(ar)}">
-            <font size="+1">
+        <tr style="border: 1px #bbb solid;" bgcolor="#${it.getRowColor(ar)}">
+          <td align="left">
               <t:jobLink job="${ar.job}"/>
-            </font>
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.passedColor}">
-            <font size="+1">${ar.passed}</font>
+          <td align="right">
+              ${ar.passed}
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.passedColor}">
-            <font size="+1">${it.format(format, ar.passed)}</font>
+          <td align="right" style="vertical-align:middle">
+            <i>
+              ${it.format(format, ar.passedPct)}
+            </i>
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.failedColor}">
-            <font size="+1">${ar.failed}</font>
+          <td align="right" style="vertical-align:middle">
+              ${ar.failed}
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.failedColor}">
-            <font size="+1">${it.format(format, ar.failedPct)}</font>
+          <td align="right" style="vertical-align:middle">
+            <i>
+              ${it.format(format, ar.failedPct)}
+            </i>
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.brokenColor}">
-            <font size="+1">${ar.broken}</font>
+          <td align="right" style="vertical-align:middle">
+              ${ar.broken}
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.brokenColor}">
-            <font size="+1">${it.format(format, ar.brokenPct)}</font>
+          <td align="right" style="vertical-align:middle">
+            <i>
+              ${it.format(format, ar.brokenPct)}
+            </i>
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.skippedColor}">
-            <font size="+1">${ar.skipped}</font>
+          <td align="right" style="vertical-align:middle">
+              ${ar.skipped}
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.skippedColor}">
-            <font size="+1">${it.format(format, ar.skippedPct)}</font>
+          <td align="right" style="vertical-align:middle">
+             <i>
+               ${it.format(format, ar.skippedPct)}
+             </i>
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.unknownColor}">
-            <font size="+1">${ar.unknown}</font>
+          <td align="right" style="vertical-align:middle">
+              ${ar.unknown}
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.unknownColor}">
-            <font size="+1">${it.format(format, ar.unknownPct)}</font>
+          <td align="right" style="vertical-align:middle">
+              <i>
+                ${it.format(format, ar.unknownPct)}
+              </i>
           </td>
-          <td align="right" style="vertical-align:middle" bgcolor="#${it.getRowColor(ar)}">
-            <font size="+1">${ar.total}</font>
+          <td align="right" style="vertical-align:middle">
+              ${ar.total}
           </td>
         </tr>
       </j:forEach>
 
       <tr class="sortbottom">
-        <td class="pane-header" height="50" align="left" style="vertical-align:middle"
+        <td class="pane-header" align="left" style="vertical-align:middle"
           bgcolor="#${it.getTotalRowColor(summary.allureResults)}">
-          <font size="+1">${%Aggregated Total}</font>
+          ${%Aggregated Total}
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
           bgcolor="#${it.passedColor}">
-          <font size="+1">${summary.passed}</font>
+          ${summary.passed}
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
           bgcolor="#${it.passedColor}">
-          <font size="+1">${it.format(format, summary.passedPct)}</font>
+          <i>${it.format(format, summary.passedPct)}</i>
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
           bgcolor="#${it.failedColor}">
-          <font size="+1">${summary.failed}</font>
+          ${summary.failed}
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
           bgcolor="#${it.failedColor}">
-          <font size="+1">${it.format(format, summary.failedPct)}</font>
+          <i>${it.format(format, summary.failedPct)}</i>
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
             bgcolor="#${it.brokenColor}">
-          <font size="+1">${summary.broken}</font>
+          ${summary.broken}
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
             bgcolor="#${it.brokenColor}">
-          <font size="+1">${it.format(format, summary.brokenPct)}</font>
+          <i>${it.format(format, summary.brokenPct)}</i>
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
           bgcolor="#${it.skippedColor}">
-          <font size="+1">${summary.skipped}</font>
+          ${summary.skipped}
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
           bgcolor="#${it.skippedColor}">
-          <font size="+1">${it.format(format, summary.skippedPct)}</font>
+          <i>${it.format(format, summary.skippedPct)}</i>
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
             bgcolor="#${it.unknownColor}">
-          <font size="+1">${summary.unknown}</font>
+          ${summary.unknown}
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
             bgcolor="#${it.unknownColor}">
-          <font size="+1">${it.format(format, summary.unknownPct)}</font>
+          <i>${it.format(format, summary.unknownPct)}</i>
         </td>
         <td class="pane-header" align="right" style="vertical-align:middle"
           bgcolor="#${it.getTotalRowColor(summary.testResults)}">
-          <font size="+1">${summary.total}</font>
+          ${summary.total}
         </td>
       </tr>
     </j:if>

@@ -27,7 +27,7 @@ THE SOFTWARE.
   <f:entry title="${%Display name}">
     <f:textbox name="portlet.name" field="name" default="${descriptor.getDisplayName()}" />
   </f:entry>
-  <f:entry title="${%Allure Hide projects with no tests}" field="hideZeroTestProjects">
+  <f:entry title="${%Hide projects with no tests}" field="hideZeroTestProjects">
       <f:checkbox />
   </f:entry>
   <f:entry title="${%Use alternate percentages on limits}" field="useAlternatePercentagesOnLimits">
