@@ -107,7 +107,7 @@ public class AllureStatisticsPortlet extends DashboardPortlet {
     } else if (allureResult.unknown > 0) {
       return unknownColor;
     } else {
-      return passedColor;
+      return null;
     }
   }
 
@@ -123,7 +123,7 @@ public class AllureStatisticsPortlet extends DashboardPortlet {
         return unknownColor;
       }
     }
-    return passedColor;
+    return null;
   }
 
   public void setUseBackgroundColors(boolean useBackgroundColors) {

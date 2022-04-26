@@ -15,6 +15,7 @@ import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class AllureStatisticsChart extends DashboardPortlet {
@@ -29,18 +30,32 @@ public class AllureStatisticsChart extends DashboardPortlet {
     final AllureResultSummary summary =
         AllureUtil.getAllureResultSummary(getDashboard().getItems(), false);
 
-    return new Graph(-1, 300, 220) {
+    return new Graph(-1, 400, 220) {
 
       @Override
       protected JFreeChart createGraph() {
         DefaultPieDataset dataset = new DefaultPieDataset();
-        dataset.setValue(Messages.Dashboard_Passed(), summary.getPassed());
-        dataset.setValue(Messages.Dashboard_FailedOrBroken(), summary.getFailed() + summary.getBroken());
-        dataset.setValue(Messages.Dashboard_SkippedOrUnknown(), summary.getSkipped() + summary.getUnknown());
+        if (summary.getPassed() > 0) {
+          dataset.setValue(Messages.Dashboard_Passed(), summary.getPassed());
+        }
+        if (summary.getFailed() > 0) {
+          dataset.setValue(
+            Messages.Dashboard_Failed(), summary.getFailed());
+        }
+        if (summary.getBroken() > 0) {
+          dataset.setValue(
+            Messages.Dashboard_Broken(), summary.getBroken());
+        }
+        if (summary.getSkipped() > 0) {
+          dataset.setValue(
+            Messages.Dashboard_Skipped(), summary.getSkipped());
+        }
+        if (summary.getUnknown() > 0) {
+          dataset.setValue(
+            Messages.Dashboard_Unknown(), summary.getUnknown());
+        }
         JFreeChart chart = ChartFactory.createPieChart(null, dataset, false, false, false);
-
         chart.setBackgroundPaint(Color.white);
-
         final PiePlot plot = (PiePlot) chart.getPlot();
 
         // plot.setAxisOffset(new Spacer(Spacer.ABSOLUTE, 5.0, 5.0, 5.0, 5.0));
@@ -53,13 +68,18 @@ public class AllureStatisticsChart extends DashboardPortlet {
         if (summary.getPassed() > 0) {
           paints.add(AllureColorPalette.LIGHT_GREEN);
         }
-        if (summary.getFailed() > 0 || summary.getBroken() > 0) {
+        if (summary.getFailed() > 0) {
           paints.add(AllureColorPalette.PALE_RED);
         }
-        if (summary.getSkipped() > 0 || summary.getUnknown() > 0) {
+        if (summary.getBroken() > 0) {
+          paints.add(AllureColorPalette.PALE_YELLOW);
+        }
+        if (summary.getSkipped() > 0) {
           paints.add(AllureColorPalette.PALE_GREY);
         }
-
+        if (summary.getUnknown() > 0) {
+          paints.add(AllureColorPalette.PURPLE);
+        }
 
         DefaultDrawingSupplier ds =
             new DefaultDrawingSupplier(
@@ -75,7 +95,8 @@ public class AllureStatisticsChart extends DashboardPortlet {
                 "{0} = {1} ({2})",
                 NumberFormat.getNumberInstance(), NumberFormat.getPercentInstance()));
         plot.setNoDataMessage(Messages.Dashboard_NoDataAvailable());
-
+        plot.setInteriorGap(0.02);
+        plot.setMaximumLabelWidth(0.10);
         return chart;
       }
     };

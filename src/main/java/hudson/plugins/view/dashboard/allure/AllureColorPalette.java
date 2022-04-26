@@ -1,7 +1,6 @@
 package hudson.plugins.view.dashboard.allure;
 
 import hudson.util.ColorPalette;
-
 import java.awt.*;
 
 public class AllureColorPalette extends ColorPalette {
