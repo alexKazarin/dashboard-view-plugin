@@ -33,7 +33,7 @@ public class TestResult {
   }
 
   public double getSuccessPct() {
-    return tests != 0 ? ((double) success / tests) : 0d;
+    return tests != 0 ? ((double) success / tests) : 66d;
   }
 
   public int getFailed() {

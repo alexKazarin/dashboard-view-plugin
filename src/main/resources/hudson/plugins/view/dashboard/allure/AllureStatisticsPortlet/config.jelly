@@ -27,4 +27,28 @@ THE SOFTWARE.
   <f:entry title="${%Display name}">
     <f:textbox name="portlet.name" field="name" default="${descriptor.getDisplayName()}" />
   </f:entry>
+  <f:entry title="${%Allure Hide projects with no tests}" field="hideZeroTestProjects">
+      <f:checkbox />
+  </f:entry>
+  <f:entry title="${%Use alternate percentages on limits}" field="useAlternatePercentagesOnLimits">
+    <f:checkbox />
+  </f:entry>
+
+  <f:optionalBlock name="useBackgroundColors" title="${%Allure Background Colors}" checked="${instance.isUseBackgroundColors()}" inline="true">
+    <f:entry title="${%Passed Color} (${%in hex})">
+      <f:textbox name="passedColor" field="passedColor" default="acd683" />
+    </f:entry>
+	  <f:entry title="${%Failed Color} (${%in hex})">
+	    <f:textbox name="failedColor" field="failedColor" default="fd7b65" />
+	  </f:entry>
+    <f:entry title="${%Broken Color} (${%in hex})">
+      <f:textbox name="brokenColor" field="brokenColor" default="ffd973" />
+    </f:entry>
+	  <f:entry title="${%Skipped Color} (${%in hex})">
+	    <f:textbox name="skippedColor" field="skippedColor" default="bbbbbb" />
+	  </f:entry>
+    <f:entry title="${%Unknown Color} (${%in hex})">
+      <f:textbox name="unknownColor" field="unknownColor" default="dc7ecb" />
+    </f:entry>
+  </f:optionalBlock>
 </j:jelly>
