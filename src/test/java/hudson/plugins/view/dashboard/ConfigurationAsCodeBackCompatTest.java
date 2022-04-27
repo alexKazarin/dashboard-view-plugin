@@ -29,7 +29,8 @@ import org.jvnet.hudson.test.Issue;
 
 public class ConfigurationAsCodeBackCompatTest {
 
-  @Rule public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+  @Rule
+  public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
   @Test
   @Issue("SECURITY-2233")
@@ -42,15 +43,13 @@ public class ConfigurationAsCodeBackCompatTest {
     Dashboard dashboard = (Dashboard) j.jenkins.getView("test");
     assertThat(dashboard.getViewName(), is("test"));
     List<DashboardPortlet> leftPortlets = dashboard.getLeftPortlets();
-    assertThat(
-        leftPortlets.get(0),
-        allOf(
+    assertThat(leftPortlets.get(0), allOf(
             instanceOf(ImagePortlet.class),
             hasProperty("name", equalTo("Image")),
-            hasProperty("imageUrl", equalTo("test-backcompat"))));
+            hasProperty("imageUrl", equalTo("test-backcompat"))
+    ));
 
-    final List<ObsoleteConfigurationMonitor.Error> errors =
-        ObsoleteConfigurationMonitor.get().getErrors();
+    final List<ObsoleteConfigurationMonitor.Error> errors = ObsoleteConfigurationMonitor.get().getErrors();
     assertThat(errors, containsInAnyOrder(new ErrorMatcher(containsString("'url' is deprecated"))));
 
     final ConfiguratorRegistry registry = ConfiguratorRegistry.get();
@@ -71,8 +70,7 @@ public class ConfigurationAsCodeBackCompatTest {
     }
 
     @Override
-    protected boolean matchesSafely(
-        final ObsoleteConfigurationMonitor.Error item, final Description mismatchDescription) {
+    protected boolean matchesSafely(final ObsoleteConfigurationMonitor.Error item, final Description mismatchDescription) {
       return messageMatcher.matches(item.message);
     }
 

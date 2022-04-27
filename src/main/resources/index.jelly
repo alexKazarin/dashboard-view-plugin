@@ -5,5 +5,5 @@
 -->
 <?jelly escape-by-default='true'?>
 <div>
-  Customizable dashboard that can present various views of job information (extended).
+  Customizable dashboard that can present various views of job information.
 </div>

@@ -9,11 +9,11 @@
     <relativePath />
   </parent>
 
-  <artifactId>dashboard-view-ext</artifactId>
+  <artifactId>dashboard-view</artifactId>
   <version>${revision}.${changelist}</version>
   <packaging>hpi</packaging>
 
-  <name>Dashboard View Extended</name>
+  <name>Dashboard View</name>
   <description>Jenkins view that shows various cuts of build information via configured portlets.
   </description>
   <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
