@@ -119,8 +119,7 @@ public class AllureUtil {
   public static AllureResult getAllureResult(Run run) {
 
     if (run != null) {
-      final FilePath report =
-        new FilePath(run.getRootDir()).child("archive/allure-report.zip");
+      final FilePath report = new FilePath(run.getRootDir()).child("archive/allure-report.zip");
 
       try {
         if (report.exists()) {
@@ -140,13 +139,14 @@ public class AllureUtil {
                   statisticsMap.put(key, statisticJson.get(key).intValue());
                 }
                 if (statisticsMap.get("total") > 0) {
-                  return new AllureResult(run.getParent(),
-                    statisticsMap.get("total"),
-                    statisticsMap.get("passed"),
-                    statisticsMap.get("failed"),
-                    statisticsMap.get("broken"),
-                    statisticsMap.get("skipped"),
-                    statisticsMap.get("unknown"));
+                  return new AllureResult(
+                      run.getParent(),
+                      statisticsMap.get("total"),
+                      statisticsMap.get("passed"),
+                      statisticsMap.get("failed"),
+                      statisticsMap.get("broken"),
+                      statisticsMap.get("skipped"),
+                      statisticsMap.get("unknown"));
                 }
               }
             }

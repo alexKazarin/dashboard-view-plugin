@@ -9,8 +9,6 @@ import hudson.plugins.view.dashboard.DashboardLog;
 import hudson.plugins.view.dashboard.DashboardPortlet;
 import hudson.plugins.view.dashboard.Messages;
 import hudson.plugins.view.dashboard.test.LocalDateLabel;
-import hudson.plugins.view.dashboard.test.TestResultSummary;
-import hudson.util.ColorPalette;
 import hudson.util.DataSetBuilder;
 import hudson.util.EnumConverter;
 import hudson.util.Graph;
@@ -303,7 +301,10 @@ public class AllureTrendChart extends DashboardPortlet {
   }
 
   private void summarize(
-      Map<LocalDate, AllureResultSummary> summaries, Run run, LocalDate firstDay, LocalDate lastDay) {
+      Map<LocalDate, AllureResultSummary> summaries,
+      Run run,
+      LocalDate firstDay,
+      LocalDate lastDay) {
     AllureResult allureResult = AllureUtil.getAllureResult(run);
 
     // for every day between first day and last day inclusive

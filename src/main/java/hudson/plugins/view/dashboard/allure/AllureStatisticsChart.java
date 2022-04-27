@@ -15,7 +15,6 @@ import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class AllureStatisticsChart extends DashboardPortlet {
@@ -39,20 +38,16 @@ public class AllureStatisticsChart extends DashboardPortlet {
           dataset.setValue(Messages.Dashboard_Passed(), summary.getPassed());
         }
         if (summary.getFailed() > 0) {
-          dataset.setValue(
-            Messages.Dashboard_Failed(), summary.getFailed());
+          dataset.setValue(Messages.Dashboard_Failed(), summary.getFailed());
         }
         if (summary.getBroken() > 0) {
-          dataset.setValue(
-            Messages.Dashboard_Broken(), summary.getBroken());
+          dataset.setValue(Messages.Dashboard_Broken(), summary.getBroken());
         }
         if (summary.getSkipped() > 0) {
-          dataset.setValue(
-            Messages.Dashboard_Skipped(), summary.getSkipped());
+          dataset.setValue(Messages.Dashboard_Skipped(), summary.getSkipped());
         }
         if (summary.getUnknown() > 0) {
-          dataset.setValue(
-            Messages.Dashboard_Unknown(), summary.getUnknown());
+          dataset.setValue(Messages.Dashboard_Unknown(), summary.getUnknown());
         }
         JFreeChart chart = ChartFactory.createPieChart(null, dataset, false, false, false);
         chart.setBackgroundPaint(Color.white);
