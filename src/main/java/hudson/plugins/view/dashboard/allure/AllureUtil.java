@@ -116,14 +116,47 @@ public class AllureUtil {
     return summaryZipEntry;
   }
 
-  public static AllureResult getTestResult(Run run) {
-    //    run.getRootDir()
-    //    AbstractTestResultAction tra = run.getAction(AbstractTestResultAction.class);
-    //    if (tra != null) {
-    return new AllureResult(run.getParent(), 777, 33, 33, 33, 33, 33);
-    //    }
+  public static AllureResult getAllureResult(Run run) {
 
-    //    return new AllureResult(run.getParent(), 0, 0, 0, 0, 0, 0);
+    if (run != null) {
+      final FilePath report =
+        new FilePath(run.getRootDir()).child("archive/allure-report.zip");
+
+      try {
+        if (report.exists()) {
+          try (ZipFile archive = new ZipFile(report.getRemote())) {
+            String reportPath = "allure-report";
+            Optional<ZipEntry> summaryZipEntry = getSummary(archive, reportPath, "export");
+            if (!summaryZipEntry.isPresent()) {
+              summaryZipEntry = getSummary(archive, reportPath, "widgets");
+            }
+            if (summaryZipEntry.isPresent()) {
+              try (InputStream is = archive.getInputStream(summaryZipEntry.get())) {
+                final ObjectMapper mapper = new ObjectMapper();
+                final JsonNode summaryJson = mapper.readTree(is);
+                final JsonNode statisticJson = summaryJson.get("statistic");
+                final Map<String, Integer> statisticsMap = new HashMap<>();
+                for (String key : BUILD_STATISTICS_KEYS) {
+                  statisticsMap.put(key, statisticJson.get(key).intValue());
+                }
+                if (statisticsMap.get("total") > 0) {
+                  return new AllureResult(run.getParent(),
+                    statisticsMap.get("total"),
+                    statisticsMap.get("passed"),
+                    statisticsMap.get("failed"),
+                    statisticsMap.get("broken"),
+                    statisticsMap.get("skipped"),
+                    statisticsMap.get("unknown"));
+                }
+              }
+            }
+          }
+        }
+      } catch (IOException | InterruptedException ignore) {
+      }
+      return new AllureResult(run.getParent(), 0, 0, 0, 0, 0, 0);
+    }
+    return null;
   }
 
   private static final boolean isMatrixJob(TopLevelItem item) {

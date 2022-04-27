@@ -106,6 +106,8 @@ public class AllureStatisticsPortlet extends DashboardPortlet {
       return skippedColor;
     } else if (allureResult.unknown > 0) {
       return unknownColor;
+    } else if (allureResult.passed > 0) {
+      return passedColor;
     } else {
       return null;
     }
@@ -121,6 +123,8 @@ public class AllureStatisticsPortlet extends DashboardPortlet {
         return skippedColor;
       } else if (allureResult.unknown > 0) {
         return unknownColor;
+      } else if (allureResult.passed > 0) {
+        return passedColor;
       }
     }
     return null;

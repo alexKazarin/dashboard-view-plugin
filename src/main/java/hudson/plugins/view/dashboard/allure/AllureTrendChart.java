@@ -1,4 +1,4 @@
-package hudson.plugins.view.dashboard.test;
+package hudson.plugins.view.dashboard.allure;
 
 import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
@@ -8,6 +8,8 @@ import hudson.model.Run;
 import hudson.plugins.view.dashboard.DashboardLog;
 import hudson.plugins.view.dashboard.DashboardPortlet;
 import hudson.plugins.view.dashboard.Messages;
+import hudson.plugins.view.dashboard.test.LocalDateLabel;
+import hudson.plugins.view.dashboard.test.TestResultSummary;
 import hudson.util.ColorPalette;
 import hudson.util.DataSetBuilder;
 import hudson.util.EnumConverter;
@@ -15,7 +17,7 @@ import hudson.util.Graph;
 import hudson.util.ListBoxModel;
 import hudson.util.ShiftedCategoryAxis;
 import hudson.util.StackedAreaRenderer2;
-import java.awt.Color;
+import java.awt.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,13 +39,15 @@ import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 
-public class TestTrendChart extends DashboardPortlet {
+public class AllureTrendChart extends DashboardPortlet {
 
   public enum DisplayStatus {
     ALL("All"),
-    SUCCESS("Success"),
+    PASSED("Passed"),
+    FAILED("Failed"),
+    BROKEN("Broken"),
     SKIPPED("Skipped"),
-    FAILED("Failed");
+    UNKNOWN("Unknown");
 
     private final String description;
 
@@ -71,7 +75,7 @@ public class TestTrendChart extends DashboardPortlet {
   private DisplayStatus displayStatus = DisplayStatus.ALL;
 
   @DataBoundConstructor
-  public TestTrendChart(
+  public AllureTrendChart(
       String name,
       int graphWidth,
       int graphHeight,
@@ -84,7 +88,7 @@ public class TestTrendChart extends DashboardPortlet {
     this.dateRange = dateRange;
     this.dateShift = dateShift;
     this.displayStatus = displayStatus;
-    DashboardLog.debug("TestTrendChart", "ctor");
+    DashboardLog.debug("AllureTrendChart", "ctor");
   }
 
   public int getDateRange() {
@@ -108,9 +112,9 @@ public class TestTrendChart extends DashboardPortlet {
   }
 
   @VisibleForTesting
-  Map<LocalDate, TestResultSummary> collectData() {
+  Map<LocalDate, AllureResultSummary> collectData() {
     // The standard equals doesn't work because two LocalDate objects can
-    // be differente even if the date is the same (different internal
+    // be different even if the date is the same (different internal
     // timestamp)
     Comparator<LocalDate> localDateComparator =
         new Comparator<LocalDate>() {
@@ -128,8 +132,8 @@ public class TestTrendChart extends DashboardPortlet {
         };
 
     // We need a custom comparator for LocalDate objects
-    final Map<LocalDate, TestResultSummary> summaries =
-        new TreeMap<LocalDate, TestResultSummary>(localDateComparator);
+    final Map<LocalDate, AllureResultSummary> summaries =
+        new TreeMap<LocalDate, AllureResultSummary>(localDateComparator);
     LocalDate today = LocalDateTime.now().minus(dateShift * 6000, ChronoUnit.MILLIS).toLocalDate();
 
     // for each job, for each day, add last build of the day to summary
@@ -205,7 +209,7 @@ public class TestTrendChart extends DashboardPortlet {
                 Messages.Dashboard_Count(), // range axis label
                 data, // data
                 PlotOrientation.VERTICAL, // orientation
-                false, // include legend
+                true, // include legend
                 false, // tooltips
                 false // urls
                 );
@@ -234,19 +238,27 @@ public class TestTrendChart extends DashboardPortlet {
         plot.setRenderer(ar);
 
         switch (getDisplayStatus()) {
-          case SUCCESS:
-            ar.setSeriesPaint(0, ColorPalette.BLUE);
-            break;
-          case SKIPPED:
-            ar.setSeriesPaint(0, ColorPalette.YELLOW);
+          case PASSED:
+            ar.setSeriesPaint(0, AllureColorPalette.LIGHT_GREEN);
             break;
           case FAILED:
-            ar.setSeriesPaint(0, ColorPalette.RED);
+            ar.setSeriesPaint(0, AllureColorPalette.PALE_RED);
+            break;
+          case BROKEN:
+            ar.setSeriesPaint(0, AllureColorPalette.PALE_YELLOW);
+            break;
+          case SKIPPED:
+            ar.setSeriesPaint(0, AllureColorPalette.PALE_GREY);
+            break;
+          case UNKNOWN:
+            ar.setSeriesPaint(0, AllureColorPalette.PURPLE);
             break;
           default:
-            ar.setSeriesPaint(0, ColorPalette.RED); // Failures.
-            ar.setSeriesPaint(1, ColorPalette.YELLOW); // Skips.
-            ar.setSeriesPaint(2, ColorPalette.BLUE); // Total.
+            ar.setSeriesPaint(0, AllureColorPalette.PALE_YELLOW);
+            ar.setSeriesPaint(1, AllureColorPalette.PALE_RED);
+            ar.setSeriesPaint(2, AllureColorPalette.LIGHT_GREEN);
+            ar.setSeriesPaint(3, AllureColorPalette.PALE_GREY);
+            ar.setSeriesPaint(4, AllureColorPalette.PURPLE);
         }
 
         // crop extra space around the graph
@@ -257,45 +269,53 @@ public class TestTrendChart extends DashboardPortlet {
     };
   }
 
-  private CategoryDataset buildDataSet(Map<LocalDate, TestResultSummary> summaries) {
+  private CategoryDataset buildDataSet(Map<LocalDate, AllureResultSummary> summaries) {
     DataSetBuilder<String, LocalDateLabel> dsb = new DataSetBuilder<String, LocalDateLabel>();
 
-    for (Map.Entry<LocalDate, TestResultSummary> entry : summaries.entrySet()) {
+    for (Map.Entry<LocalDate, AllureResultSummary> entry : summaries.entrySet()) {
       LocalDateLabel label = new LocalDateLabel(entry.getKey());
 
       switch (getDisplayStatus()) {
-        case SUCCESS:
-          dsb.add(entry.getValue().getSuccess(), Messages.Dashboard_Total(), label);
-          break;
-        case SKIPPED:
-          dsb.add(entry.getValue().getSkipped(), Messages.Dashboard_Skipped(), label);
+        case PASSED:
+          dsb.add(entry.getValue().getPassed(), Messages.Dashboard_Passed(), label);
           break;
         case FAILED:
           dsb.add(entry.getValue().getFailed(), Messages.Dashboard_Failed(), label);
           break;
-        default:
-          dsb.add(entry.getValue().getSuccess(), Messages.Dashboard_Total(), label);
-          dsb.add(entry.getValue().getFailed(), Messages.Dashboard_Failed(), label);
+        case BROKEN:
+          dsb.add(entry.getValue().getBroken(), Messages.Dashboard_Broken(), label);
+          break;
+        case SKIPPED:
           dsb.add(entry.getValue().getSkipped(), Messages.Dashboard_Skipped(), label);
+          break;
+        case UNKNOWN:
+          dsb.add(entry.getValue().getUnknown(), Messages.Dashboard_Unknown(), label);
+          break;
+        default:
+          dsb.add(entry.getValue().getPassed(), Messages.Dashboard_Passed(), label);
+          dsb.add(entry.getValue().getFailed(), Messages.Dashboard_Failed(), label);
+          dsb.add(entry.getValue().getBroken(), Messages.Dashboard_Broken(), label);
+          dsb.add(entry.getValue().getSkipped(), Messages.Dashboard_Skipped(), label);
+          dsb.add(entry.getValue().getUnknown(), Messages.Dashboard_Unknown(), label);
       }
     }
     return dsb.build();
   }
 
   private void summarize(
-      Map<LocalDate, TestResultSummary> summaries, Run run, LocalDate firstDay, LocalDate lastDay) {
-    TestResult testResult = TestUtil.getTestResult(run);
+      Map<LocalDate, AllureResultSummary> summaries, Run run, LocalDate firstDay, LocalDate lastDay) {
+    AllureResult allureResult = AllureUtil.getAllureResult(run);
 
     // for every day between first day and last day inclusive
     for (LocalDate curr = firstDay; curr.compareTo(lastDay) <= 0; curr = curr.plusDays(1)) {
-      if (testResult.getTests() != 0) {
-        TestResultSummary trs = summaries.get(curr);
-        if (trs == null) {
-          trs = new TestResultSummary();
-          summaries.put(curr, trs);
+      if (allureResult.getTotal() != 0) {
+        AllureResultSummary ars = summaries.get(curr);
+        if (ars == null) {
+          ars = new AllureResultSummary();
+          summaries.put(curr, ars);
         }
 
-        trs.addTestResult(testResult);
+        ars.addAllureResult(allureResult);
       }
     }
   }
@@ -305,7 +325,7 @@ public class TestTrendChart extends DashboardPortlet {
 
     @Override
     public String getDisplayName() {
-      return Messages.Dashboard_TestTrendChart();
+      return Messages.Dashboard_AllureTrendChart();
     }
 
     public DisplayStatus getDefaultDisplayStatus() {
@@ -320,9 +340,11 @@ public class TestTrendChart extends DashboardPortlet {
     public ListBoxModel doFillDisplayStatusItems() {
       final ListBoxModel items = new ListBoxModel();
       items.add(DisplayStatus.ALL.getDescription(), DisplayStatus.ALL.getName());
-      items.add(DisplayStatus.SUCCESS.getDescription(), DisplayStatus.SUCCESS.getName());
+      items.add(DisplayStatus.PASSED.getDescription(), DisplayStatus.PASSED.getName());
       items.add(DisplayStatus.FAILED.getDescription(), DisplayStatus.FAILED.getName());
+      items.add(DisplayStatus.BROKEN.getDescription(), DisplayStatus.BROKEN.getName());
       items.add(DisplayStatus.SKIPPED.getDescription(), DisplayStatus.SKIPPED.getName());
+      items.add(DisplayStatus.UNKNOWN.getDescription(), DisplayStatus.UNKNOWN.getName());
       return items;
     }
   }
