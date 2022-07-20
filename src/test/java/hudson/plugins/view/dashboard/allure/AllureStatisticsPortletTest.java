@@ -1,9 +1,8 @@
 package hudson.plugins.view.dashboard.allure;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import hudson.plugins.view.dashboard.test.TestResult;
-import hudson.plugins.view.dashboard.test.TestStatisticsPortlet;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +10,7 @@ import org.junit.Test;
 
 public class AllureStatisticsPortletTest {
 
-  /** Test of format method, of class TestStatisticsPortlet. */
+  /** Test of format method, of class AllureStatisticsPortlet. */
   @Test
   public void testFormatLessThan1Percent() {
     AllureStatisticsPortlet instance =
@@ -23,11 +22,11 @@ public class AllureStatisticsPortletTest {
     assertEquals(expResult, result);
   }
 
-  /** Test of format method, of class TestStatisticsPortlet. */
+  /** Test of format method, of class AllureStatisticsPortlet. */
   @Test
   public void testAlternateFormatLessThan1Percent() {
-    TestStatisticsPortlet instance =
-        new TestStatisticsPortlet("test", false, null, null, null, false);
+    AllureStatisticsPortlet instance =
+        new AllureStatisticsPortlet("test", false, null, null, null, null, null, false);
     instance.setUseAlternatePercentagesOnLimits(true);
     DecimalFormat df = new DecimalFormat("0%");
     double val = 0.003d;
@@ -36,11 +35,11 @@ public class AllureStatisticsPortletTest {
     assertEquals(expResult, result);
   }
 
-  /** Test of format method, of class TestStatisticsPortlet. */
+  /** Test of format method, of class AllureStatisticsPortlet. */
   @Test
   public void testFormatBetween1PercentAnd99Percent() {
-    TestStatisticsPortlet instance =
-        new TestStatisticsPortlet("test", false, null, null, null, false);
+    AllureStatisticsPortlet instance =
+        new AllureStatisticsPortlet("test", false, null, null, null, null, null, false);
     DecimalFormat df = new DecimalFormat("0%");
     double val = 0.5d;
     String expResult = "50%";
@@ -48,11 +47,11 @@ public class AllureStatisticsPortletTest {
     assertEquals(expResult, result);
   }
 
-  /** Test of format method, of class TestStatisticsPortlet. */
+  /** Test of format method, of class AllureStatisticsPortlet. */
   @Test
   public void testFormatGreaterThan99Percent() {
-    TestStatisticsPortlet instance =
-        new TestStatisticsPortlet("test", false, null, null, null, false);
+    AllureStatisticsPortlet instance =
+        new AllureStatisticsPortlet("test", false, null, null, null, null, null,false);
     DecimalFormat df = new DecimalFormat("0%");
     double val = 0.996d;
     String expResult = "<100%";
@@ -60,11 +59,11 @@ public class AllureStatisticsPortletTest {
     assertEquals(expResult, result);
   }
 
-  /** Test of format method, of class TestStatisticsPortlet. */
+  /** Test of format method, of class AllureStatisticsPortlet. */
   @Test
   public void testAlternateFormatGreaterThan99Percent() {
-    TestStatisticsPortlet instance =
-        new TestStatisticsPortlet("test", false, null, null, null, false);
+    AllureStatisticsPortlet instance =
+        new AllureStatisticsPortlet("test", false, null, null, null, null, null, false);
     instance.setUseAlternatePercentagesOnLimits(true);
     DecimalFormat df = new DecimalFormat("0%");
     double val = 0.996d;
@@ -73,11 +72,11 @@ public class AllureStatisticsPortletTest {
     assertEquals(expResult, result);
   }
 
-  /** Test of format method, of class TestStatisticsPortlet. */
+  /** Test of format method, of class AllureStatisticsPortlet. */
   @Test
   public void testFormatEqualTo100Percent() {
-    TestStatisticsPortlet instance =
-        new TestStatisticsPortlet("test", false, null, null, null, false);
+    AllureStatisticsPortlet instance =
+        new AllureStatisticsPortlet("test", false, null, null, null, null, null, false);
     DecimalFormat df = new DecimalFormat("0%");
     double val = 1d;
     String expResult = "100%";
@@ -85,11 +84,11 @@ public class AllureStatisticsPortletTest {
     assertEquals(expResult, result);
   }
 
-  /** Test of format method, of class TestStatisticsPortlet. */
+  /** Test of format method, of class AllureStatisticsPortlet. */
   @Test
   public void testFormatEqualTo0Percent() {
-    TestStatisticsPortlet instance =
-        new TestStatisticsPortlet("test", false, null, null, null, false);
+    AllureStatisticsPortlet instance =
+        new AllureStatisticsPortlet("test", false, null, null, null, null, null,false);
     DecimalFormat df = new DecimalFormat("0%");
     double val = 0d;
     String expResult = "0%";
@@ -98,47 +97,58 @@ public class AllureStatisticsPortletTest {
   }
 
   @Test
-  public void testRowColor() {
-    TestStatisticsPortlet instance =
-        new TestStatisticsPortlet("test", false, "green", "red", "orange", false);
-    assertEquals("green", instance.getRowColor(new TestResult(null, 3, 0, 0)));
-    assertEquals("red", instance.getRowColor(new TestResult(null, 1, 1, 0)));
-    assertEquals("orange", instance.getRowColor(new TestResult(null, 1, 0, 1)));
+  public void testRowColorOnlyTotal() {
+    AllureStatisticsPortlet instance =
+      new AllureStatisticsPortlet("test", false, "a", "b", "c", "d", "e", false);
+    assertNull(instance.getRowColor(new AllureResult(null, 3, 0, 0, 0, 0, 0)));
+  }
+
+  @Test
+  public void testRowColorFailedPriority() {
+    AllureStatisticsPortlet instance =
+      new AllureStatisticsPortlet("test", false, "passed", "failed", "broken", "skipped", "unknown", false);
+    assertEquals("failed", instance.getRowColor(new AllureResult(null, 3, 1, 1, 1, 1, 1)));
+  }
+
+  @Test
+  public void testTotalRowColorWithNull() {
+    AllureStatisticsPortlet instance =
+      new AllureStatisticsPortlet("test", false, "passed", "failed", "broken", "skipped", "unknown", false);
+    assertNull(instance.getTotalRowColor(null));
   }
 
   @Test
   public void testSummaryRowColorWithOneRow() {
     AllureStatisticsPortlet instance =
-        new AllureStatisticsPortlet("test", false, null, "green", "red", "orange", null, false);
+      new AllureStatisticsPortlet("test", false, "passed", "failed", "broken", "skipped", "unknown", false);
+    assertNull(instance.getTotalRowColor(
+      Collections.singletonList(new AllureResult(null, 3, 0, 0, 0, 0, 0))));
     assertEquals(
-        "green",
-        instance.getTotalRowColor(
-            Collections.singletonList(new AllureResult(null, 3, 0, 0, 0, 0, 0))));
-    assertEquals(
-        "red",
+        "passed",
         instance.getTotalRowColor(
             Collections.singletonList(new AllureResult(null, 1, 1, 0, 0, 0, 0))));
     assertEquals(
-        "orange",
+        "failed",
         instance.getTotalRowColor(
             Collections.singletonList(new AllureResult(null, 1, 0, 1, 0, 0, 0))));
   }
 
   @Test
   public void testSummaryRowColorWithMultipleRows() {
-    TestStatisticsPortlet instance =
-        new TestStatisticsPortlet("test", false, "green", "red", "orange", false);
+    AllureStatisticsPortlet instance =
+      new AllureStatisticsPortlet("test", false, "passed", "failed", "broken", "skipped", "unknown", false);
+    assertNull(instance.getTotalRowColor(
+      Arrays.asList(new AllureResult(null, 2, 1, 1, 0, 0, 0),
+        null)));
     assertEquals(
-        "green",
+        "passed",
         instance.getTotalRowColor(
-            Arrays.asList(new TestResult(null, 2, 0, 0), new TestResult(null, 2, 0, 0))));
+            Arrays.asList(new AllureResult(null, 1, 1, 0,0,0,0),
+              new AllureResult(null, 1, 1, 0,0,0,0))));
     assertEquals(
-        "red",
+        "skipped",
         instance.getTotalRowColor(
-            Arrays.asList(new TestResult(null, 1, 0, 0), new TestResult(null, 1, 1, 0))));
-    assertEquals(
-        "orange",
-        instance.getTotalRowColor(
-            Arrays.asList(new TestResult(null, 1, 0, 0), new TestResult(null, 1, 0, 1))));
+            Arrays.asList(new AllureResult(null, 1, 1, 0,0,0,0),
+              new AllureResult(null, 1, 0, 0,0,1,1))));
   }
 }

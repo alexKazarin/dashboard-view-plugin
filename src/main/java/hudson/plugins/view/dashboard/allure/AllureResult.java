@@ -32,12 +32,22 @@ public class AllureResult {
     return total;
   }
 
+  public AllureResult setPassed(int passed) {
+    this.passed = passed;
+    return this;
+  }
+
   public int getPassed() {
     return passed;
   }
 
   public double getPassedPct() {
     return getPct(passed);
+  }
+
+  public AllureResult setFailed(int failed) {
+    this.failed = failed;
+    return this;
   }
 
   public int getFailed() {
@@ -48,6 +58,11 @@ public class AllureResult {
     return getPct(failed);
   }
 
+  public AllureResult setBroken(int broken)
+  {
+    this.broken = broken;
+    return this;
+  }
   public int getBroken() {
     return broken;
   }
@@ -56,12 +71,22 @@ public class AllureResult {
     return getPct(broken);
   }
 
+  public AllureResult setSkipped(int skipped) {
+    this.skipped = skipped;
+    return this;
+  }
+
   public int getSkipped() {
     return skipped;
   }
 
   public double getSkippedPct() {
     return getPct(skipped);
+  }
+
+  public AllureResult setUnknown(int unknown) {
+    this.unknown = unknown;
+    return this;
   }
 
   public int getUnknown() {
@@ -74,5 +99,9 @@ public class AllureResult {
 
   private double getPct(double dividendValue) {
     return total != 0 ? ((double) dividendValue / total) : 0d;
+  }
+
+  public int getSummarized() {
+    return getPassed() + getFailed() + getBroken() + getSkipped() + getUnknown();
   }
 }

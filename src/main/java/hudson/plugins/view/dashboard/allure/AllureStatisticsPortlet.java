@@ -14,7 +14,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 /**
  * Portlet that presents a grid of test result data with summation
  *
- * @author Peter Hayes
+ * @author Aleksey Kazarin
  */
 public class AllureStatisticsPortlet extends DashboardPortlet {
   private boolean useBackgroundColors;
@@ -114,20 +114,30 @@ public class AllureStatisticsPortlet extends DashboardPortlet {
   }
 
   public String getTotalRowColor(List<AllureResult> allureResults) {
-    for (AllureResult allureResult : allureResults) {
-      if (allureResult.failed > 0) {
-        return failedColor;
-      } else if (allureResult.broken > 0) {
-        return brokenColor;
-      } else if (allureResult.skipped > 0) {
-        return skippedColor;
-      } else if (allureResult.unknown > 0) {
-        return unknownColor;
-      } else if (allureResult.passed > 0) {
-        return passedColor;
-      }
+    if (allureResults == null) {
+      return null;
     }
-    return null;
+    AllureResult accumulatedResults = new AllureResult(null, 0,0,0,0,0,0);
+    for (AllureResult allureResult : allureResults) {
+      if (allureResult == null || allureResult.getSummarized() <= 0) {
+        return null;
+      }
+      accumulatedResults.setPassed(accumulatedResults.getPassed() + allureResult.getPassed());
+      accumulatedResults.setFailed(accumulatedResults.getFailed() + allureResult.getFailed());
+      accumulatedResults.setBroken(accumulatedResults.getBroken() + allureResult.getBroken());
+      accumulatedResults.setSkipped(accumulatedResults.getSkipped() + allureResult.getSkipped());
+      accumulatedResults.setUnknown(accumulatedResults.getUnknown() + allureResult.getUnknown());
+    }
+    if (accumulatedResults.getFailed() > 0) {
+      return failedColor;
+    } else if (accumulatedResults.getBroken() > 0) {
+      return brokenColor;
+    } else if (accumulatedResults.getSkipped() > 0) {
+      return skippedColor;
+    } else if (accumulatedResults.getUnknown() > 0) {
+      return unknownColor;
+    }
+    return passedColor;
   }
 
   public void setUseBackgroundColors(boolean useBackgroundColors) {
