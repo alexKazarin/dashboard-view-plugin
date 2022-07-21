@@ -97,11 +97,11 @@ public class AllureResult {
     return getPct(unknown);
   }
 
-  private double getPct(double dividendValue) {
+  protected double getPct(int dividendValue) {
     return total != 0 ? ((double) dividendValue / total) : 0d;
   }
 
-  public int getSummarized() {
+  protected int getSummarized() {
     return getPassed() + getFailed() + getBroken() + getSkipped() + getUnknown();
   }
 }
