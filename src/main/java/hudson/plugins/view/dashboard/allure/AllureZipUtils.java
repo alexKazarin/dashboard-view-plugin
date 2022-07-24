@@ -12,6 +12,9 @@ public final class AllureZipUtils {
   private AllureZipUtils() {}
 
   public static List<ZipEntry> listEntries(ZipFile zip, String path) {
+    if (zip == null || path == null) {
+      return null;
+    }
     final Enumeration<? extends ZipEntry> entries = zip.entries();
     final List<ZipEntry> files = new ArrayList<>();
     while (entries.hasMoreElements()) {

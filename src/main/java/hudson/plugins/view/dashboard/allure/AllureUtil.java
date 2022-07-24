@@ -23,6 +23,8 @@ import java.util.zip.ZipFile;
 
 public class AllureUtil {
 
+  private static final String ALLURE_REPORT_DEFAULT_ZIP = "archive/allure-report.zip";
+  private static final String ALLURE_REPORT_DIRECTORY = "allure-report";
   private static final List<String> BUILD_STATISTICS_KEYS =
       Arrays.asList("passed", "failed", "broken", "skipped", "unknown", "total");
 
@@ -59,12 +61,12 @@ public class AllureUtil {
     Run lastBuildRun = job.getLastBuild();
     if (lastBuildRun != null) {
       final FilePath report =
-          new FilePath(lastBuildRun.getRootDir()).child("archive/allure-report.zip");
+          new FilePath(lastBuildRun.getRootDir()).child(ALLURE_REPORT_DEFAULT_ZIP);
 
       try {
         if (report.exists()) {
           try (ZipFile archive = new ZipFile(report.getRemote())) {
-            String reportPath = "allure-report";
+            String reportPath = ALLURE_REPORT_DIRECTORY;
             Optional<ZipEntry> summaryZipEntry = getSummary(archive, reportPath, "export");
             if (!summaryZipEntry.isPresent()) {
               summaryZipEntry = getSummary(archive, reportPath, "widgets");
@@ -119,12 +121,12 @@ public class AllureUtil {
   public static AllureResult getAllureResult(Run run) {
 
     if (run != null) {
-      final FilePath report = new FilePath(run.getRootDir()).child("archive/allure-report.zip");
+      final FilePath report = new FilePath(run.getRootDir()).child(ALLURE_REPORT_DEFAULT_ZIP);
 
       try {
         if (report.exists()) {
           try (ZipFile archive = new ZipFile(report.getRemote())) {
-            String reportPath = "allure-report";
+            String reportPath = ALLURE_REPORT_DIRECTORY;
             Optional<ZipEntry> summaryZipEntry = getSummary(archive, reportPath, "export");
             if (!summaryZipEntry.isPresent()) {
               summaryZipEntry = getSummary(archive, reportPath, "widgets");
