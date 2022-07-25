@@ -160,7 +160,7 @@ public class AllureTrendChart extends DashboardPortlet {
                   .toLocalDate();
           Run nextRun = run.getNextBuild();
 
-          if (nextRun != null) {
+          if (nextRun != null && !nextRun.isBuilding()) {
             LocalDate nextRunDay =
                 Instant.ofEpochMilli(nextRun.getTimeInMillis())
                     .atZone(ZoneId.systemDefault())
@@ -309,7 +309,7 @@ public class AllureTrendChart extends DashboardPortlet {
 
     // for every day between first day and last day inclusive
     for (LocalDate curr = firstDay; curr.compareTo(lastDay) <= 0; curr = curr.plusDays(1)) {
-      if (allureResult.getTotal() != 0) {
+      if (allureResult != null && allureResult.getTotal() != 0) {
         AllureResultSummary ars = summaries.get(curr);
         if (ars == null) {
           ars = new AllureResultSummary();
