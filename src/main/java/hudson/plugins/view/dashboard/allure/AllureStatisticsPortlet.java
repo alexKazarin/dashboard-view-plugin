@@ -117,7 +117,7 @@ public class AllureStatisticsPortlet extends DashboardPortlet {
     if (allureResults == null) {
       return null;
     }
-    AllureResult accumulatedResults = new AllureResult(null, 0,0,0,0,0,0);
+    AllureResult accumulatedResults = new AllureResult(null, 0, 0, 0, 0, 0, 0);
     for (AllureResult allureResult : allureResults) {
       if (allureResult == null || allureResult.getSummarized() <= 0) {
         return null;

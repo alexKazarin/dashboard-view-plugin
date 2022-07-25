@@ -11,6 +11,13 @@ public final class AllureZipUtils {
 
   private AllureZipUtils() {}
 
+  /**
+   * Static method to parse zip archive and extract entities from it
+   *
+   * @param zip - ZipFile of allure-report archive
+   * @param path - directory or file to extract from archive
+   * @return List<ZipEntry> - list of found entries
+   */
   public static List<ZipEntry> listEntries(ZipFile zip, String path) {
     if (zip == null || path == null) {
       return null;

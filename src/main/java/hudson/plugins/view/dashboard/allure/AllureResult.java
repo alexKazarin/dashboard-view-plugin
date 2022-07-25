@@ -58,11 +58,11 @@ public class AllureResult {
     return getPct(failed);
   }
 
-  public AllureResult setBroken(int broken)
-  {
+  public AllureResult setBroken(int broken) {
     this.broken = broken;
     return this;
   }
+
   public int getBroken() {
     return broken;
   }
