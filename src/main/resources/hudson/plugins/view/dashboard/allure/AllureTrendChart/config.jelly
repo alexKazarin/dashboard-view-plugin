@@ -38,7 +38,7 @@ THE SOFTWARE.
   </f:entry>
   <!--<f:optionalBlock name="dynamic" title="Specify a date range">-->
     <f:entry title="${%Number of latest days to display}">
-      <f:textbox name="dateRange" field="dateRange" value="${it.dateRange}"/>
+      <f:textbox name="dateRange" field="dateRange" value="${it.dateRange}" default="15"/>
     </f:entry>
   <!--</f:optionalBlock>-->
   <!--<f:optionalBlock name="dynamic" title="Specify a time shift">-->

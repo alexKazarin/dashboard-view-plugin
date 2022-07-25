@@ -112,6 +112,7 @@ public class AllureUtil {
           }
         }
       } catch (IOException | InterruptedException ignore) {
+        return null;
       }
     }
     return null;
