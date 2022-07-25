@@ -57,50 +57,11 @@ public class AllureUtil {
 
   private static void summarizeJob(
       Job job, AllureResultSummary summary, boolean hideZeroTestProjects) {
-    boolean addBlank = true;
-    Run lastBuildRun = job.getLastBuild();
-    if (lastBuildRun != null) {
-      final FilePath report =
-          new FilePath(lastBuildRun.getRootDir()).child(ALLURE_REPORT_DEFAULT_ZIP);
-
-      try {
-        if (report.exists()) {
-          try (ZipFile archive = new ZipFile(report.getRemote())) {
-            String reportPath = ALLURE_REPORT_DIRECTORY;
-            Optional<ZipEntry> summaryZipEntry = getSummary(archive, reportPath, "export");
-            if (!summaryZipEntry.isPresent()) {
-              summaryZipEntry = getSummary(archive, reportPath, "widgets");
-            }
-            if (summaryZipEntry.isPresent()) {
-              try (InputStream is = archive.getInputStream(summaryZipEntry.get())) {
-                final ObjectMapper mapper = new ObjectMapper();
-                final JsonNode summaryJson = mapper.readTree(is);
-                final JsonNode statisticJson = summaryJson.get("statistic");
-                final Map<String, Integer> statisticsMap = new HashMap<>();
-                for (String key : BUILD_STATISTICS_KEYS) {
-                  statisticsMap.put(key, statisticJson.get(key).intValue());
-                }
-                addBlank = false;
-                if (statisticsMap.get("total") > 0 || !hideZeroTestProjects)
-                  summary.addAllureResult(
-                      new AllureResult(
-                          job,
-                          statisticsMap.get("total"),
-                          statisticsMap.get("passed"),
-                          statisticsMap.get("failed"),
-                          statisticsMap.get("broken"),
-                          statisticsMap.get("skipped"),
-                          statisticsMap.get("unknown")));
-              }
-            }
-          }
-        }
-      } catch (IOException | InterruptedException ignore) {
-      }
-    }
-
-    if (addBlank && !hideZeroTestProjects) {
-      summary.addAllureResult(new AllureResult(job, 0, 0, 0, 0, 0, 0));
+    AllureResult allureResult = getAllureResult(job.getLastCompletedBuild());
+    if (!hideZeroTestProjects) {
+      summary.addAllureResult(allureResult);
+    } else if (allureResult != null && allureResult.getSummarized() > 0) {
+      summary.addAllureResult(allureResult);
     }
   }
 
@@ -119,10 +80,8 @@ public class AllureUtil {
   }
 
   public static AllureResult getAllureResult(Run run) {
-
     if (run != null) {
       final FilePath report = new FilePath(run.getRootDir()).child(ALLURE_REPORT_DEFAULT_ZIP);
-
       try {
         if (report.exists()) {
           try (ZipFile archive = new ZipFile(report.getRemote())) {
@@ -140,23 +99,20 @@ public class AllureUtil {
                 for (String key : BUILD_STATISTICS_KEYS) {
                   statisticsMap.put(key, statisticJson.get(key).intValue());
                 }
-                if (statisticsMap.get("total") > 0) {
-                  return new AllureResult(
-                      run.getParent(),
-                      statisticsMap.get("total"),
-                      statisticsMap.get("passed"),
-                      statisticsMap.get("failed"),
-                      statisticsMap.get("broken"),
-                      statisticsMap.get("skipped"),
-                      statisticsMap.get("unknown"));
-                }
+                return new AllureResult(
+                    run.getParent(),
+                    statisticsMap.get("total"),
+                    statisticsMap.get("passed"),
+                    statisticsMap.get("failed"),
+                    statisticsMap.get("broken"),
+                    statisticsMap.get("skipped"),
+                    statisticsMap.get("unknown"));
               }
             }
           }
         }
       } catch (IOException | InterruptedException ignore) {
       }
-      return new AllureResult(run.getParent(), 0, 0, 0, 0, 0, 0);
     }
     return null;
   }

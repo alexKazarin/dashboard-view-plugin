@@ -11,17 +11,16 @@ public class AllureResultSummary extends AllureResult {
     super(null, 0, 0, 0, 0, 0, 0);
   }
 
-  public AllureResultSummary addAllureResult(AllureResult allureResult) {
-    allureResults.add(allureResult);
-
-    total += allureResult.getTotal();
-    passed += allureResult.getPassed();
-    failed += allureResult.getFailed();
-    broken += allureResult.getBroken();
-    skipped += allureResult.getSkipped();
-    unknown += allureResult.getUnknown();
-
-    return this;
+  public void addAllureResult(AllureResult allureResult) {
+    if (allureResult != null) {
+      allureResults.add(allureResult);
+      total += allureResult.getTotal();
+      passed += allureResult.getPassed();
+      failed += allureResult.getFailed();
+      broken += allureResult.getBroken();
+      skipped += allureResult.getSkipped();
+      unknown += allureResult.getUnknown();
+    }
   }
 
   public List<AllureResult> getAllureResults() {

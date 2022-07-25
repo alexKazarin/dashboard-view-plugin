@@ -11,7 +11,7 @@
   }
   @keyframes blinker {
     50% {
-      opacity: 0;
+      opacity: 0.3;
     }
   }
   </style>
@@ -34,6 +34,7 @@
     </tr>
     <j:if test="${it.useBackgroundColors}">
       <j:forEach var="ar" items="${summary.allureResults}">
+        <j:set var="blinking" value=""/>
         <j:if test="${ar.job.isBuilding()}">
           <j:set var="blinking" value="blink"/>
         </j:if>
@@ -42,7 +43,7 @@
               <t:jobLink job="${ar.job}"/>
           </td>
           <td align="right">
-              ${ar.passed} - ${ar.job.isBuilding()}
+              ${ar.passed}
           </td>
           <td align="right" style="vertical-align:middle">
             <i>
