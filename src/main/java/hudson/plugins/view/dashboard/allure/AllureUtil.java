@@ -1,25 +1,20 @@
 package hudson.plugins.view.dashboard.allure;
 
-import static hudson.plugins.view.dashboard.allure.AllureZipUtils.listEntries;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
 import hudson.FilePath;
 import hudson.matrix.MatrixProject;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TopLevelItem;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import static hudson.plugins.view.dashboard.allure.AllureZipUtils.listEntries;
 
 public class AllureUtil {
 
@@ -55,8 +50,7 @@ public class AllureUtil {
     return summary;
   }
 
-  private static void summarizeJob(
-      Job job, AllureResultSummary summary, boolean hideZeroTestProjects) {
+  private static void summarizeJob(Job job, AllureResultSummary summary, boolean hideZeroTestProjects) {
     AllureResult allureResult = getAllureResult(job.getLastCompletedBuild());
     if (!hideZeroTestProjects) {
       summary.addAllureResult(allureResult);
@@ -65,50 +59,20 @@ public class AllureUtil {
     }
   }
 
-  private static Optional<ZipEntry> getSummary(
-      final ZipFile archive, final String reportPath, final String location) {
-    List<ZipEntry> entries = listEntries(archive, reportPath.concat("/").concat(location));
-    Optional<ZipEntry> summaryZipEntry =
-        Iterables.tryFind(
-            entries,
-            input ->
-                input != null
-                    && input
-                        .getName()
-                        .equals(reportPath.concat("/").concat(location).concat("/summary.json")));
-    return summaryZipEntry;
-  }
-
   public static AllureResult getAllureResult(Run run) {
     if (run != null) {
       final FilePath report = new FilePath(run.getRootDir()).child(ALLURE_REPORT_DEFAULT_ZIP);
       try {
         if (report.exists()) {
           try (ZipFile archive = new ZipFile(report.getRemote())) {
-            String reportPath = ALLURE_REPORT_DIRECTORY;
-            Optional<ZipEntry> summaryZipEntry = getSummary(archive, reportPath, "export");
-            if (!summaryZipEntry.isPresent()) {
-              summaryZipEntry = getSummary(archive, reportPath, "widgets");
-            }
-            if (summaryZipEntry.isPresent()) {
-              try (InputStream is = archive.getInputStream(summaryZipEntry.get())) {
-                final ObjectMapper mapper = new ObjectMapper();
-                final JsonNode summaryJson = mapper.readTree(is);
-                final JsonNode statisticJson = summaryJson.get("statistic");
-                final Map<String, Integer> statisticsMap = new HashMap<>();
-                for (String key : BUILD_STATISTICS_KEYS) {
-                  statisticsMap.put(key, statisticJson.get(key).intValue());
-                }
-                return new AllureResult(
-                    run.getParent(),
-                    statisticsMap.get("total"),
-                    statisticsMap.get("passed"),
-                    statisticsMap.get("failed"),
-                    statisticsMap.get("broken"),
-                    statisticsMap.get("skipped"),
-                    statisticsMap.get("unknown"));
-              }
-            }
+            AllureResult ar = getAllureResultFromZipFile(archive);
+            return new AllureResult(run.getParent(),
+              ar.getTotal(),
+              ar.getPassed(),
+              ar.getFailed(),
+              ar.getBroken(),
+              ar.getSkipped(),
+              ar.getUnknown());
           }
         }
       } catch (IOException | InterruptedException ignore) {
@@ -116,6 +80,39 @@ public class AllureUtil {
       }
     }
     return null;
+  }
+
+  protected static AllureResult getAllureResultFromZipFile(ZipFile archive) {
+    AllureResult ar = new AllureResult(null, 0,0,0,0,0,0);
+    ZipEntry summaryZipEntry = Optional
+      .ofNullable(getSummary(archive, ALLURE_REPORT_DIRECTORY.concat("/export")))
+      .orElse(getSummary(archive, ALLURE_REPORT_DIRECTORY.concat("/widgets")));
+    if (summaryZipEntry != null && summaryZipEntry.getSize() != 0) {
+      try (InputStream is = archive.getInputStream(summaryZipEntry)) {
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode summaryJson = mapper.readTree(is);
+        final JsonNode statisticJson = summaryJson.get("statistic");
+        final Map<String, Integer> statisticsMap = new HashMap<>();
+        for (String key : BUILD_STATISTICS_KEYS) {
+          statisticsMap.put(key, statisticJson.get(key).intValue());
+        }
+        ar.setTotal(statisticsMap.get("total"))
+          .setPassed(statisticsMap.get("passed"))
+          .setFailed(statisticsMap.get("failed"))
+          .setBroken(statisticsMap.get("broken"))
+          .setSkipped(statisticsMap.get("skipped"))
+          .setUnknown(statisticsMap.get("unknown"));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return ar;
+  }
+
+  protected static ZipEntry getSummary(final ZipFile archive, final String locationPath) {
+    Optional<List<ZipEntry>> entries = Optional
+      .ofNullable(listEntries(archive, locationPath + "/summary.json"));
+    return entries.isPresent() && entries.get().size() != 0 ? entries.get().get(0) : null;
   }
 
   private static final boolean isMatrixJob(TopLevelItem item) {

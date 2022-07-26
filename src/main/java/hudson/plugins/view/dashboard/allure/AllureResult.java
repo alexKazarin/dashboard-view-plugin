@@ -28,6 +28,11 @@ public class AllureResult {
     return job;
   }
 
+  public AllureResult setTotal(int total) {
+    this.total = total;
+    return this;
+  }
+
   public int getTotal() {
     return total;
   }

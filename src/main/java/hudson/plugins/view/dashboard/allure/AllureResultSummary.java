@@ -12,15 +12,16 @@ public class AllureResultSummary extends AllureResult {
   }
 
   public void addAllureResult(AllureResult allureResult) {
-    if (allureResult != null) {
-      allureResults.add(allureResult);
-      total += allureResult.getTotal();
-      passed += allureResult.getPassed();
-      failed += allureResult.getFailed();
-      broken += allureResult.getBroken();
-      skipped += allureResult.getSkipped();
-      unknown += allureResult.getUnknown();
+    if (allureResult == null) {
+      allureResult = new AllureResult(null, 0,0,0,0,0,0);
     }
+    allureResults.add(allureResult);
+    total += allureResult.getTotal();
+    passed += allureResult.getPassed();
+    failed += allureResult.getFailed();
+    broken += allureResult.getBroken();
+    skipped += allureResult.getSkipped();
+    unknown += allureResult.getUnknown();
   }
 
   public List<AllureResult> getAllureResults() {

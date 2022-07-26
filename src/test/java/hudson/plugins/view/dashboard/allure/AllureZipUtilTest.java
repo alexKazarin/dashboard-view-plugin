@@ -1,8 +1,7 @@
 package hudson.plugins.view.dashboard.allure;
 
 import static hudson.plugins.view.dashboard.allure.AllureZipUtils.listEntries;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
