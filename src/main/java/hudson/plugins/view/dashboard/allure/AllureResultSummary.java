@@ -13,7 +13,7 @@ public class AllureResultSummary extends AllureResult {
 
   public void addAllureResult(AllureResult allureResult) {
     if (allureResult == null) {
-      allureResult = new AllureResult(null, 0,0,0,0,0,0);
+      allureResult = new AllureResult(null, 0, 0, 0, 0, 0, 0);
     }
     allureResults.add(allureResult);
     total += allureResult.getTotal();

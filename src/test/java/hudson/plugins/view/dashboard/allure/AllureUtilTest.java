@@ -2,12 +2,11 @@ package hudson.plugins.view.dashboard.allure;
 
 import static org.junit.Assert.*;
 
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.junit.Test;
 
 public class AllureUtilTest {
 
@@ -18,10 +17,13 @@ public class AllureUtilTest {
   /** Test of getSummary, of class AllureUtil. */
   @Test
   public void testGetSummaryExistingPath() {
-    String pathToFile = Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
+    String pathToFile =
+        Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
 
-    ZipEntry summaryZipEntry = AllureUtil
-      .getSummary(initZipFile(pathToFile), ALLURE_REPORT_DIRECTORY.concat(ALLURE_REPORT_WIDGETS_LOCATION));
+    ZipEntry summaryZipEntry =
+        AllureUtil.getSummary(
+            initZipFile(pathToFile),
+            ALLURE_REPORT_DIRECTORY.concat(ALLURE_REPORT_WIDGETS_LOCATION));
 
     assertNotNull(summaryZipEntry);
     assertNotEquals(0, summaryZipEntry.getSize());
@@ -29,43 +31,44 @@ public class AllureUtilTest {
 
   @Test
   public void testGetSummaryWrongPath() {
-    String pathToFile = Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
+    String pathToFile =
+        Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
 
-    ZipEntry summaryZipEntry = AllureUtil
-      .getSummary(initZipFile(pathToFile), "random".concat(ALLURE_REPORT_WIDGETS_LOCATION));
+    ZipEntry summaryZipEntry =
+        AllureUtil.getSummary(
+            initZipFile(pathToFile), "random".concat(ALLURE_REPORT_WIDGETS_LOCATION));
 
     assertNull(summaryZipEntry);
   }
 
   @Test
   public void testGetSummaryNullPath() {
-    String pathToFile = Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
+    String pathToFile =
+        Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
 
-    ZipEntry summaryZipEntry = AllureUtil
-      .getSummary(initZipFile(pathToFile), null);
+    ZipEntry summaryZipEntry = AllureUtil.getSummary(initZipFile(pathToFile), null);
 
     assertNull(summaryZipEntry);
   }
 
   @Test
   public void testGetSummaryNullZip() {
-    ZipEntry summaryZipEntry = AllureUtil
-      .getSummary(null, ALLURE_REPORT_DIRECTORY.concat(ALLURE_REPORT_WIDGETS_LOCATION));
+    ZipEntry summaryZipEntry =
+        AllureUtil.getSummary(null, ALLURE_REPORT_DIRECTORY.concat(ALLURE_REPORT_WIDGETS_LOCATION));
 
     assertNull(summaryZipEntry);
   }
 
   @Test
   public void testGetAllureResultFromZipFileWithWidgetsSummary() {
-    String pathToFile = Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
+    String pathToFile =
+        Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
 
-    AllureResult allureResult = AllureUtil
-      .getAllureResultFromZipFile(initZipFile(pathToFile));
+    AllureResult allureResult = AllureUtil.getAllureResultFromZipFile(initZipFile(pathToFile));
 
     assertNotNull(allureResult);
     assertEquals(8, allureResult.getTotal());
   }
-
 
   private ZipFile initZipFile(String pathToFile) {
     ZipFile archive;

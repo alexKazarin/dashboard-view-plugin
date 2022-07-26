@@ -19,7 +19,8 @@ public class AllureZipUtilTest {
   /** Test of ListEntries, of class AllureZipUtils. */
   @Test
   public void testListEntriesExistingPath() {
-    String pathToFile = Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
+    String pathToFile =
+        Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
     String pathToElement = ALLURE_REPORT_DIRECTORY.concat(ALLURE_REPORT_WIDGETS_LOCATION);
 
     List<ZipEntry> entries = listEntries(initZipFile(pathToFile), pathToElement);
@@ -30,7 +31,8 @@ public class AllureZipUtilTest {
 
   @Test
   public void testListEntriesNotExistingPath() {
-    String pathToFile = Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
+    String pathToFile =
+        Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
     String pathToElement = ALLURE_REPORT_DIRECTORY.concat("/random");
 
     List<ZipEntry> entries = listEntries(initZipFile(pathToFile), pathToElement);
@@ -41,7 +43,8 @@ public class AllureZipUtilTest {
 
   @Test
   public void testListEntriesEmptyPath() {
-    String pathToFile = Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
+    String pathToFile =
+        Objects.requireNonNull(getClass().getResource(ALLURE_REPORT_RESOURCE)).getPath();
     String pathToElement = "";
 
     List<ZipEntry> entries = listEntries(initZipFile(pathToFile), pathToElement);

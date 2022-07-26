@@ -1,5 +1,7 @@
 package hudson.plugins.view.dashboard.allure;
 
+import static hudson.plugins.view.dashboard.allure.AllureZipUtils.listEntries;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.FilePath;
@@ -7,14 +9,11 @@ import hudson.matrix.MatrixProject;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TopLevelItem;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import static hudson.plugins.view.dashboard.allure.AllureZipUtils.listEntries;
 
 public class AllureUtil {
 
@@ -50,7 +49,8 @@ public class AllureUtil {
     return summary;
   }
 
-  private static void summarizeJob(Job job, AllureResultSummary summary, boolean hideZeroTestProjects) {
+  private static void summarizeJob(
+      Job job, AllureResultSummary summary, boolean hideZeroTestProjects) {
     AllureResult allureResult = getAllureResult(job.getLastCompletedBuild());
     if (!hideZeroTestProjects) {
       summary.addAllureResult(allureResult);
@@ -66,13 +66,14 @@ public class AllureUtil {
         if (report.exists()) {
           try (ZipFile archive = new ZipFile(report.getRemote())) {
             AllureResult ar = getAllureResultFromZipFile(archive);
-            return new AllureResult(run.getParent(),
-              ar.getTotal(),
-              ar.getPassed(),
-              ar.getFailed(),
-              ar.getBroken(),
-              ar.getSkipped(),
-              ar.getUnknown());
+            return new AllureResult(
+                run.getParent(),
+                ar.getTotal(),
+                ar.getPassed(),
+                ar.getFailed(),
+                ar.getBroken(),
+                ar.getSkipped(),
+                ar.getUnknown());
           }
         }
       } catch (IOException | InterruptedException ignore) {
@@ -83,10 +84,10 @@ public class AllureUtil {
   }
 
   protected static AllureResult getAllureResultFromZipFile(ZipFile archive) {
-    AllureResult ar = new AllureResult(null, 0,0,0,0,0,0);
-    ZipEntry summaryZipEntry = Optional
-      .ofNullable(getSummary(archive, ALLURE_REPORT_DIRECTORY.concat("/export")))
-      .orElse(getSummary(archive, ALLURE_REPORT_DIRECTORY.concat("/widgets")));
+    AllureResult ar = new AllureResult(null, 0, 0, 0, 0, 0, 0);
+    ZipEntry summaryZipEntry =
+        Optional.ofNullable(getSummary(archive, ALLURE_REPORT_DIRECTORY.concat("/export")))
+            .orElse(getSummary(archive, ALLURE_REPORT_DIRECTORY.concat("/widgets")));
     if (summaryZipEntry != null && summaryZipEntry.getSize() != 0) {
       try (InputStream is = archive.getInputStream(summaryZipEntry)) {
         final ObjectMapper mapper = new ObjectMapper();
@@ -97,11 +98,11 @@ public class AllureUtil {
           statisticsMap.put(key, statisticJson.get(key).intValue());
         }
         ar.setTotal(statisticsMap.get("total"))
-          .setPassed(statisticsMap.get("passed"))
-          .setFailed(statisticsMap.get("failed"))
-          .setBroken(statisticsMap.get("broken"))
-          .setSkipped(statisticsMap.get("skipped"))
-          .setUnknown(statisticsMap.get("unknown"));
+            .setPassed(statisticsMap.get("passed"))
+            .setFailed(statisticsMap.get("failed"))
+            .setBroken(statisticsMap.get("broken"))
+            .setSkipped(statisticsMap.get("skipped"))
+            .setUnknown(statisticsMap.get("unknown"));
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -110,8 +111,8 @@ public class AllureUtil {
   }
 
   protected static ZipEntry getSummary(final ZipFile archive, final String locationPath) {
-    Optional<List<ZipEntry>> entries = Optional
-      .ofNullable(listEntries(archive, locationPath + "/summary.json"));
+    Optional<List<ZipEntry>> entries =
+        Optional.ofNullable(listEntries(archive, locationPath + "/summary.json"));
     return entries.isPresent() && entries.get().size() != 0 ? entries.get().get(0) : null;
   }
 
